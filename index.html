@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Troy Wash Express</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #1B6EF3;
+            --blue-dark: #1459C7;
+            --blue-light: #EBF3FF;
+            --blue-soft: #D4E6FF;
+            --green: #0CAA56;
+            --green-light: #E7F8EF;
+            --orange: #F5A623;
+            --orange-light: #FFF5E0;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --bg: #F7F8FA;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --shadow: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+            --radius: 16px;
+            --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        body {
+            font-family: var(--font);
+            background: #0f1115;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Phone frame for desktop viewing */
+        .phone-frame {
+            width: 390px;
+            height: 844px;
+            background: var(--bg);
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 0 8px #1a1a1a, 0 0 0 10px #333, var(--shadow-lg);
+        }
+
+        /* Notch */
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 28px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            z-index: 100;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 60px 20px 100px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        .screen.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Status bar */
+        .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 54px;
+            background: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 28px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 50;
+        }
+        .status-bar .time { margin-left: 4px; }
+        .status-icons { display: flex; gap: 5px; align-items: center; }
+        .status-icons svg { width: 16px; height: 16px; }
+
+        /* Bottom nav */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 8px 16px;
+            z-index: 50;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 10px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .nav-item.active { color: var(--blue); }
+        .nav-item svg { width: 22px; height: 22px; }
+
+        /* ============ SCREEN 1: HOME ============ */
+        .home-header {
+            background: var(--white);
+            margin: -60px -20px 20px;
+            padding: 62px 20px 20px;
+        }
+        .home-greeting {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .home-name {
+            font-size: 22px;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        .home-location {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--blue);
+            font-weight: 600;
+        }
+        .home-location svg { width: 16px; height: 16px; fill: var(--blue); }
+
+        .promo-banner {
+            background: linear-gradient(135deg, var(--blue) 0%, #3B82F6 100%);
+            border-radius: var(--radius);
+            padding: 22px;
+            margin-bottom: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .promo-banner::after {
+            content: '🚗';
+            position: absolute;
+            right: 16px;
+            bottom: 8px;
+            font-size: 56px;
+            opacity: 0.2;
+        }
+        .promo-tag {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .promo-title {
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+        .promo-sub {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .section-label {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        /* Package cards */
+        .package-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .package-card:hover, .package-card:active {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px var(--blue-soft);
+        }
+        .package-card.popular {
+            border-color: var(--blue);
+        }
+        .popular-badge {
+            position: absolute;
+            top: -1px;
+            right: 16px;
+            background: var(--blue);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px 5px;
+            border-radius: 0 0 8px 8px;
+            letter-spacing: 0.5px;
+        }
+        .pkg-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .pkg-name { font-size: 17px; font-weight: 700; }
+        .pkg-time { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .pkg-price { font-size: 22px; font-weight: 800; color: var(--blue); }
+        .pkg-price span { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+        .pkg-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .pkg-feat {
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--blue-light);
+            color: var(--blue);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* ============ SCREEN 2: TIME SLOTS ============ */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            margin-bottom: 16px;
+            background: none;
+            border: none;
+            font-family: var(--font);
+        }
+        .back-btn svg { width: 20px; height: 20px; }
+
+        .screen-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .screen-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .selected-pkg-mini {
+            background: var(--blue-light);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .spm-name { font-weight: 700; font-size: 15px; }
+        .spm-price { font-weight: 800; color: var(--blue); font-size: 16px; }
+
+        .date-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .date-scroll::-webkit-scrollbar { display: none; }
+
+        .date-chip {
+            flex-shrink: 0;
+            width: 60px;
+            padding: 10px 0;
+            text-align: center;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--white);
+        }
+        .date-chip.selected {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: white;
+        }
+        .date-chip .day { font-size: 11px; font-weight: 500; opacity: 0.7; }
+        .date-chip .num { font-size: 20px; font-weight: 800; margin: 2px 0; }
+        .date-chip .month { font-size: 10px; font-weight: 600; opacity: 0.6; }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .time-slot {
+            padding: 14px 8px;
+            text-align: center;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--white);
+        }
+        .time-slot:hover { border-color: var(--blue); }
+        .time-slot.selected {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: white;
+        }
+        .time-slot.unavailable {
+            opacity: 0.3;
+            pointer-events: none;
+            text-decoration: line-through;
+        }
+        .time-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .time-slot.selected .time-label { color: rgba(255,255,255,0.7); }
+
+        .continue-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: var(--font);
+            cursor: pointer;
+            margin-top: 24px;
+            transition: background 0.2s;
+        }
+        .continue-btn:hover { background: var(--blue-dark); }
+        .continue-btn:disabled {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: default;
+        }
+
+        /* ============ SCREEN 3: PAYMENT ============ */
+        .order-summary {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .os-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .os-row.total {
+            border-top: 1px dashed var(--border);
+            margin-top: 6px;
+            padding-top: 12px;
+            font-weight: 800;
+            font-size: 16px;
+        }
+        .os-label { color: var(--text-secondary); }
+        .os-value { font-weight: 600; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            color: var(--text-secondary);
+        }
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: var(--font);
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s;
+            background: var(--white);
+        }
+        .form-input:focus { border-color: var(--blue); }
+        .form-input::placeholder { color: var(--text-muted); }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .pm-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            background: var(--white);
+            transition: all 0.2s;
+        }
+        .pm-btn.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+
+        .secure-note {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            justify-content: center;
+        }
+        .secure-note svg { width: 14px; height: 14px; fill: var(--green); }
+
+        /* ============ SCREEN 4: CONFIRMATION ============ */
+        .confirm-screen { text-align: center; }
+        .confirm-icon {
+            width: 80px; height: 80px;
+            background: var(--green-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto 16px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        .confirm-icon svg { width: 40px; height: 40px; fill: var(--green); }
+        .confirm-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .confirm-sub {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .booking-details {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        .bd-ref {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .bd-ref-code {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--blue);
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+        }
+        .bd-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--bg);
+            font-size: 14px;
+        }
+        .bd-row:last-child { border-bottom: none; }
+        .bd-label { color: var(--text-secondary); }
+        .bd-value { font-weight: 600; }
+
+        .qr-box {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        .qr-placeholder {
+            width: 120px; height: 120px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            border: 2px dashed var(--border);
+        }
+        .qr-note { font-size: 12px; color: var(--text-muted); text-align: center; }
+
+        .home-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--white);
+            color: var(--blue);
+            border: 2px solid var(--blue);
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .home-btn:hover { background: var(--blue-light); }
+
+        /* Water savings badge */
+        .eco-badge {
+            background: var(--green-light);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .eco-badge svg { width: 28px; height: 28px; flex-shrink: 0; }
+        .eco-text { font-size: 12px; color: var(--green); font-weight: 600; line-height: 1.4; }
+
+        /* Responsive — remove phone frame on mobile */
+        @media (max-width: 430px) {
+            body { background: var(--bg); }
+            .phone-frame {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .phone-frame::before { display: none; }
+            .screen { padding: 20px 20px 100px; }
+            .home-header { margin: -20px -20px 20px; padding: 20px 20px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <span class="time">9:41</span>
+        <div class="status-icons">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+        </div>
+    </div>
+
+    <!-- ============ SCREEN 1: HOME ============ -->
+    <div class="screen active" id="screen-home">
+        <div class="home-header">
+            <div class="home-greeting">Good morning 👋</div>
+            <div class="home-name">Rafsun</div>
+            <div class="home-location">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+                300 Feet Road, Bashundhara
+            </div>
+        </div>
+
+        <div class="promo-banner">
+            <div class="promo-tag">Founding Member</div>
+            <div class="promo-title">30% OFF for life<br>for first 200 members</div>
+            <div class="promo-sub">Only 180 spots remaining</div>
+        </div>
+
+        <div class="eco-badge">
+            <svg viewBox="0 0 24 24" fill="#0CAA56"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zM7.83 14c.37 0 .67.26.74.62.41 2.22 2.28 2.98 3.64 2.87.43-.02.79.32.79.75 0 .4-.32.73-.72.75-2.13.13-4.62-1.09-5.19-4.12a.75.75 0 01.74-.87z"/></svg>
+            <div class="eco-text">Each automated wash saves 120+ liters of water compared to manual washing</div>
+        </div>
+
+        <div class="section-label">Choose your wash</div>
+
+        <div class="package-card" onclick="selectPackage('Basic Exterior', 299)">
+            <div class="pkg-top">
+                <div>
+                    <div class="pkg-name">Basic Exterior</div>
+                    <div class="pkg-time">⏱ 5 minutes</div>
+                </div>
+                <div class="pkg-price">৳299 <span>/ wash</span></div>
+            </div>
+            <div class="pkg-features">
+                <span class="pkg-feat">Auto tunnel wash</span>
+                <span class="pkg-feat">Spot-free rinse</span>
+                <span class="pkg-feat">Air dry</span>
+            </div>
+        </div>
+
+        <div class="package-card popular" onclick="selectPackage('Premium Wash', 499)">
+            <div class="popular-badge">MOST POPULAR</div>
+            <div class="pkg-top">
+                <div>
+                    <div class="pkg-name">Premium Wash</div>
+                    <div class="pkg-time">⏱ 7 minutes</div>
+                </div>
+                <div class="pkg-price">৳499 <span>/ wash</span></div>
+            </div>
+            <div class="pkg-features">
+                <span class="pkg-feat">Auto tunnel wash</span>
+                <span class="pkg-feat">Foam polish</span>
+                <span class="pkg-feat">Wheel clean</span>
+                <span class="pkg-feat">Underbody rinse</span>
+            </div>
+        </div>
+
+        <div class="package-card" onclick="selectPackage('Deluxe Detail', 799)">
+            <div class="pkg-top">
+                <div>
+                    <div class="pkg-name">Deluxe Detail</div>
+                    <div class="pkg-time">⏱ 12 minutes</div>
+                </div>
+                <div class="pkg-price">৳799 <span>/ wash</span></div>
+            </div>
+            <div class="pkg-features">
+                <span class="pkg-feat">Auto tunnel wash</span>
+                <span class="pkg-feat">Triple foam</span>
+                <span class="pkg-feat">Ceramic coating</span>
+                <span class="pkg-feat">Interior vacuum</span>
+                <span class="pkg-feat">Dashboard wipe</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; margin-bottom: 8px;">
+            <div class="section-label">Unlimited Plans</div>
+        </div>
+
+        <div class="package-card" onclick="selectPackage('Monthly Unlimited', 1499)" style="border-color: var(--orange); background: var(--orange-light);">
+            <div class="pkg-top">
+                <div>
+                    <div class="pkg-name">Monthly Unlimited</div>
+                    <div class="pkg-time">🔄 Unlimited washes · 30 days</div>
+                </div>
+                <div class="pkg-price" style="color: var(--orange);">৳1,499 <span>/ mo</span></div>
+            </div>
+            <div class="pkg-features">
+                <span class="pkg-feat" style="background: var(--orange-light); color: #B8780A;">Premium wash included</span>
+                <span class="pkg-feat" style="background: var(--orange-light); color: #B8780A;">No booking needed</span>
+                <span class="pkg-feat" style="background: var(--orange-light); color: #B8780A;">Priority lane</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ SCREEN 2: TIME SLOTS ============ -->
+    <div class="screen" id="screen-time">
+        <button class="back-btn" onclick="goTo('screen-home')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            Back
+        </button>
+
+        <div class="screen-title">Pick a time</div>
+        <div class="screen-subtitle">Choose your preferred date and time slot</div>
+
+        <div class="selected-pkg-mini">
+            <span class="spm-name" id="selected-pkg-name">Premium Wash</span>
+            <span class="spm-price" id="selected-pkg-price">৳499</span>
+        </div>
+
+        <div class="section-label">Date</div>
+        <div class="date-scroll">
+            <div class="date-chip selected" onclick="selectDate(this)">
+                <div class="day">SAT</div>
+                <div class="num">8</div>
+                <div class="month">FEB</div>
+            </div>
+            <div class="date-chip" onclick="selectDate(this)">
+                <div class="day">SUN</div>
+                <div class="num">9</div>
+                <div class="month">FEB</div>
+            </div>
+            <div class="date-chip" onclick="selectDate(this)">
+                <div class="day">MON</div>
+                <div class="num">10</div>
+                <div class="month">FEB</div>
+            </div>
+            <div class="date-chip" onclick="selectDate(this)">
+                <div class="day">TUE</div>
+                <div class="num">11</div>
+                <div class="month">FEB</div>
+            </div>
+            <div class="date-chip" onclick="selectDate(this)">
+                <div class="day">WED</div>
+                <div class="num">12</div>
+                <div class="month">FEB</div>
+            </div>
+            <div class="date-chip" onclick="selectDate(this)">
+                <div class="day">THU</div>
+                <div class="num">13</div>
+                <div class="month">FEB</div>
+            </div>
+        </div>
+
+        <div class="section-label">Morning</div>
+        <div class="time-grid" style="margin-bottom: 16px;">
+            <div class="time-slot" onclick="selectTime(this)">8:00 AM<div class="time-label">Available</div></div>
+            <div class="time-slot" onclick="selectTime(this)">8:30 AM<div class="time-label">Available</div></div>
+            <div class="time-slot unavailable">9:00 AM<div class="time-label">Full</div></div>
+            <div class="time-slot" onclick="selectTime(this)">9:30 AM<div class="time-label">Available</div></div>
+            <div class="time-slot" onclick="selectTime(this)">10:00 AM<div class="time-label">Available</div></div>
+            <div class="time-slot unavailable">10:30 AM<div class="time-label">Full</div></div>
+        </div>
+
+        <div class="section-label">Afternoon</div>
+        <div class="time-grid" style="margin-bottom: 16px;">
+            <div class="time-slot" onclick="selectTime(this)">12:00 PM<div class="time-label">Available</div></div>
+            <div class="time-slot" onclick="selectTime(this)">12:30 PM<div class="time-label">Available</div></div>
+            <div class="time-slot" onclick="selectTime(this)">1:00 PM<div class="time-label">Available</div></div>
+            <div class="time-slot unavailable">1:30 PM<div class="time-label">Full</div></div>
+            <div class="time-slot" onclick="selectTime(this)">2:00 PM<div class="time-label">Available</div></div>
+            <div class="time-slot" onclick="selectTime(this)">2:30 PM<div class="time-label">Available</div></div>
+        </div>
+
+        <div class="section-label">Evening</div>
+        <div class="time-grid">
+            <div class="time-slot" onclick="selectTime(this)">4:00 PM<div class="time-label">Available</div></div>
+            <div class="time-slot" onclick="selectTime(this)">4:30 PM<div class="time-label">Available</div></div>
+            <div class="time-slot" onclick="selectTime(this)">5:00 PM<div class="time-label">Available</div></div>
+            <div class="time-slot" onclick="selectTime(this)">5:30 PM<div class="time-label">Available</div></div>
+            <div class="time-slot unavailable">6:00 PM<div class="time-label">Full</div></div>
+            <div class="time-slot" onclick="selectTime(this)">6:30 PM<div class="time-label">Available</div></div>
+        </div>
+
+        <button class="continue-btn" id="time-continue-btn" disabled onclick="goTo('screen-payment')">Select a time to continue</button>
+    </div>
+
+    <!-- ============ SCREEN 3: PAYMENT ============ -->
+    <div class="screen" id="screen-payment">
+        <button class="back-btn" onclick="goTo('screen-time')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            Back
+        </button>
+
+        <div class="screen-title">Payment</div>
+        <div class="screen-subtitle">Review your booking and pay</div>
+
+        <div class="order-summary">
+            <div class="os-row">
+                <span class="os-label">Service</span>
+                <span class="os-value" id="pay-service">Premium Wash</span>
+            </div>
+            <div class="os-row">
+                <span class="os-label">Date & Time</span>
+                <span class="os-value" id="pay-datetime">Sat, 8 Feb · 10:00 AM</span>
+            </div>
+            <div class="os-row">
+                <span class="os-label">Location</span>
+                <span class="os-value">300 Feet Road</span>
+            </div>
+            <div class="os-row">
+                <span class="os-label">Subtotal</span>
+                <span class="os-value" id="pay-subtotal">৳499</span>
+            </div>
+            <div class="os-row">
+                <span class="os-label">Founding member discount</span>
+                <span class="os-value" style="color: var(--green);" id="pay-discount">-৳150</span>
+            </div>
+            <div class="os-row total">
+                <span>Total</span>
+                <span id="pay-total">৳349</span>
+            </div>
+        </div>
+
+        <div class="section-label">Payment method</div>
+        <div class="payment-methods">
+            <div class="pm-btn active" onclick="selectPayment(this)">💳 Card</div>
+            <div class="pm-btn" onclick="selectPayment(this)">📱 bKash</div>
+            <div class="pm-btn" onclick="selectPayment(this)">🏦 Nagad</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Card Number</label>
+            <input class="form-input" placeholder="4242 4242 4242 4242" maxlength="19">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Expiry</label>
+                <input class="form-input" placeholder="MM / YY">
+            </div>
+            <div class="form-group">
+                <label class="form-label">CVV</label>
+                <input class="form-input" placeholder="•••" maxlength="3">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Cardholder Name</label>
+            <input class="form-input" placeholder="Rafsun Hossnain">
+        </div>
+
+        <button class="continue-btn" onclick="goTo('screen-confirm')" id="pay-btn">Pay ৳349</button>
+
+        <div class="secure-note">
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            Secured with 256-bit encryption
+        </div>
+    </div>
+
+    <!-- ============ SCREEN 4: CONFIRMATION ============ -->
+    <div class="screen confirm-screen" id="screen-confirm">
+        <div class="confirm-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <div class="confirm-title">Booking Confirmed! 🎉</div>
+        <div class="confirm-sub">Your car wash is scheduled. We'll send a reminder 30 minutes before.</div>
+
+        <div class="booking-details">
+            <div class="bd-ref">Booking Reference</div>
+            <div class="bd-ref-code">TWX-2026-0847</div>
+            <div class="bd-row">
+                <span class="bd-label">Service</span>
+                <span class="bd-value" id="conf-service">Premium Wash</span>
+            </div>
+            <div class="bd-row">
+                <span class="bd-label">Date</span>
+                <span class="bd-value" id="conf-date">Saturday, 8 Feb 2026</span>
+            </div>
+            <div class="bd-row">
+                <span class="bd-label">Time</span>
+                <span class="bd-value" id="conf-time">10:00 AM</span>
+            </div>
+            <div class="bd-row">
+                <span class="bd-label">Location</span>
+                <span class="bd-value">300 Feet Road, Bashundhara</span>
+            </div>
+            <div class="bd-row">
+                <span class="bd-label">Amount Paid</span>
+                <span class="bd-value" style="color: var(--green);" id="conf-amount">৳349</span>
+            </div>
+        </div>
+
+        <div class="qr-box">
+            <div class="qr-placeholder">
+                <div style="text-align:center;">
+                    <div style="font-size:28px; margin-bottom:4px;">📱</div>
+                    QR Code
+                </div>
+            </div>
+            <div class="qr-note">Show this QR code when you arrive at the wash tunnel</div>
+        </div>
+
+        <div class="eco-badge" style="justify-content: center;">
+            <svg viewBox="0 0 24 24" fill="#0CAA56" width="22" height="22"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/></svg>
+            <div class="eco-text">🌿 This wash saves 120L of water vs manual washing!</div>
+        </div>
+
+        <button class="home-btn" onclick="resetApp()">Back to Home</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="goTo('screen-home')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            Home
+        </div>
+        <div class="nav-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+            Bookings
+        </div>
+        <div class="nav-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+            Plans
+        </div>
+        <div class="nav-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Profile
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedPkg = { name: 'Premium Wash', price: 499 };
+    let selectedTimeStr = '';
+
+    function goTo(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        // Scroll to top
+        document.getElementById(screenId).scrollTop = 0;
+    }
+
+    function selectPackage(name, price) {
+        selectedPkg = { name, price };
+        document.getElementById('selected-pkg-name').textContent = name;
+        document.getElementById('selected-pkg-price').textContent = '৳' + price.toLocaleString();
+        
+        // Update payment screen
+        document.getElementById('pay-service').textContent = name;
+        document.getElementById('pay-subtotal').textContent = '৳' + price.toLocaleString();
+        const discount = Math.round(price * 0.30);
+        const total = price - discount;
+        document.getElementById('pay-discount').textContent = '-৳' + discount.toLocaleString();
+        document.getElementById('pay-total').textContent = '৳' + total.toLocaleString();
+        document.getElementById('pay-btn').textContent = 'Pay ৳' + total.toLocaleString();
+        
+        // Update confirmation screen
+        document.getElementById('conf-service').textContent = name;
+        document.getElementById('conf-amount').textContent = '৳' + total.toLocaleString();
+        
+        goTo('screen-time');
+    }
+
+    function selectDate(el) {
+        document.querySelectorAll('.date-chip').forEach(d => d.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function selectTime(el) {
+        document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedTimeStr = el.childNodes[0].textContent;
+        
+        const btn = document.getElementById('time-continue-btn');
+        btn.disabled = false;
+        btn.textContent = 'Continue with ' + selectedTimeStr;
+        
+        // Update payment & confirmation screens
+        const dateChip = document.querySelector('.date-chip.selected');
+        const day = dateChip.querySelector('.day').textContent;
+        const num = dateChip.querySelector('.num').textContent;
+        const month = dateChip.querySelector('.month').textContent;
+        document.getElementById('pay-datetime').textContent = day + ', ' + num + ' ' + month + ' · ' + selectedTimeStr;
+        document.getElementById('conf-date').textContent = day + ', ' + num + ' ' + month + ' 2026';
+        document.getElementById('conf-time').textContent = selectedTimeStr;
+    }
+
+    function selectPayment(el) {
+        document.querySelectorAll('.pm-btn').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function resetApp() {
+        // Reset time selections
+        document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+        document.getElementById('time-continue-btn').disabled = true;
+        document.getElementById('time-continue-btn').textContent = 'Select a time to continue';
+        goTo('screen-home');
+    }
+</script>
+
+</body>
+</html>
